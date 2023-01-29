@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDyteClient, DyteProvider } from '@dytesdk/react-web-core';
-import { DyteMeeting } from '@dytesdk/react-ui-kit';
+import { DyteGrid, DyteCameraToggle, DyteMicToggle } from '@dytesdk/react-ui-kit';
 
 const Video = () => {
   const navigate = useNavigate();
@@ -22,9 +22,11 @@ const Video = () => {
     <>
       <DyteProvider value={meeting}>
         <div className="container column-centered">
-          <DyteMeeting meeting={meeting} mode="fill" showSetupScreen={false} />
+          <DyteGrid meeting={meeting} />
         </div>
         <div className="control-buttons">
+          <DyteCameraToggle meeting={meeting} size='sm' />
+          <DyteMicToggle meeting={meeting} size='sm' />
           <button type="button" onClick={() => navigate('/documents')}>
             Previous
           </button>
