@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const CustomInput = ({ label }) => (
   <div>
@@ -13,6 +13,7 @@ CustomInput.propTypes = {
 
 const Form = () => {
   const navigate = useNavigate();
+  const { search } = useLocation();
   return (
     <>
       <div className="container column-centered">
@@ -22,7 +23,7 @@ const Form = () => {
         <CustomInput label="Contact number" />
       </div>
       <div className="control-buttons">
-        <button type="button" onClick={() => navigate('/documents')}>
+        <button type="button" onClick={() => navigate('/documents' + search)}>
           Next
         </button>
       </div>

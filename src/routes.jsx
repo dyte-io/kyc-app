@@ -9,7 +9,7 @@ function AppRoutes() {
 
   return (
     <Routes key={location.pathname} location={location}>
-      <Route path="/form" element={<Form />} />
+      <Route path="/" element={<Form />} />
       <Route path="/documents" element={<Documents />} />
       <Route path="/video" element={<Video />} />
     </Routes>

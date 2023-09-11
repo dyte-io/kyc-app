@@ -1,8 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Documents = () => {
   const navigate = useNavigate();
+  const { search } = useLocation();
   return (
     <>
       <div className="container column-centered">
@@ -25,10 +26,10 @@ const Documents = () => {
         </div>
       </div>
       <div className="control-buttons">
-        <button type="button" onClick={() => navigate('/form')}>
+        <button type="button" onClick={() => navigate('/form' + search)}>
           Previous
         </button>
-        <button type="button" onClick={() => navigate('/video')}>
+        <button type="button" onClick={() => navigate('/video' + search)}>
           Next
         </button>
       </div>

@@ -1,33 +1,50 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate , useSearchParams } from 'react-router-dom';
 import { useDyteClient, DyteProvider } from '@dytesdk/react-web-core';
-import { DyteGrid, DyteCameraToggle, DyteMicToggle } from '@dytesdk/react-ui-kit';
+import { DyteGrid, DyteCameraToggle, DyteMicToggle, generateConfig, provideDyteDesignSystem } from '@dytesdk/react-ui-kit';
 
 const Video = () => {
   const navigate = useNavigate();
-  const [meeting, initClient] = useDyteClient();
+  const { search } = useLocation();
+  const [, initClient] = useDyteClient();
+  const [meeting, setMeeting] = useState();
+  const [config, setConfig] = useState();
+  const [inProgress, setInProgress] = useState(false);
+  let [searchParams] = useSearchParams();
+
 
   useEffect(() => {
+    if (inProgress || meeting) return;
+    setInProgress(true);
     initClient({
-      authToken:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjdkMTdhNzIzLTNjMDItNGRkYy05OWNkLTY5ZmQ4MGY0YWUzYyIsIm1lZXRpbmdJZCI6IjU3MDhkZWVlLWVkZDktNGY3YS04Nzc4LTc3NmE3NWI0OTVlZiIsInBhcnRpY2lwYW50SWQiOiJmMTNhZGY4ZS1iZTJkLTQ5MWMtYjNmMi1jOTU2YjYwZDc2YTAiLCJwcmVzZXRJZCI6IjdkMmQzYjYzLTAyNzAtNDE0MC1iOTNlLWRjNDg2MmUwMWQzYSIsImlhdCI6MTY3NDkyMzc0NywiZXhwIjoxNjgzNTYzNzQ3fQ.hu4uUTBVFrrYelsNHTkkgOtGN72KjXK2B6Tx57ZvpJ4ZqjrWCqiUPCJukg3w0uybScMqibP5IYS-8wiCVtQTQmvyaHr96Be0a1ANZ6MMtO57cJie-WtAzNNDhMf5Aupn67G8HapRGMC0kYLSEMg77gsXwZKJc8zabJWj534yAqRMbhSO1cbA4Cbk3p9z-F7S8h8OP24dVY1e2jItAaCvZnf46l9HqN7jQnNNTe5MxtG1ZtyVqv5H0z5RTKTcDRSpQ6wUsDBN8xs5XsLtjsU6JOdHGY3QuEPHv-fzbopk8g340o2nZPqIF9SvTtNyVakZs77QeuDbxg32ERGH6BG8sw',
+      authToken: searchParams.get('authToken'),
       defaults: {
         video: false,
         audio: false,
       },
+    }).then(async (meet) => {
+      setMeeting(meet);
+      const presetConfig = meet.self.suggestedTheme;
+      const uiConfig = generateConfig(presetConfig, meet).config;
+
+      provideDyteDesignSystem(document.body, uiConfig.designTokens);
+      setConfig(uiConfig);
+      await meet.joinRoom();
     });
   }, []);
+
+  if (!meeting && !config) return null;
 
   return (
     <>
       <DyteProvider value={meeting}>
         <div className="container column-centered">
-          <DyteGrid meeting={meeting} />
+          <DyteGrid meeting={meeting} config={config} />
         </div>
         <div className="control-buttons">
           <DyteCameraToggle meeting={meeting} size='sm' />
           <DyteMicToggle meeting={meeting} size='sm' />
-          <button type="button" onClick={() => navigate('/documents')}>
+          <button type="button" onClick={() => navigate('/documents' + search)}>
             Previous
           </button>
           <button type="button">Finish</button>
